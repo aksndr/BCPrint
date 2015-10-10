@@ -1,23 +1,24 @@
 import com.aksndr.BCPrint;
 import com.itextpdf.text.*;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
 import org.junit.Assert;
 
-import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class Test {
 
-    @org.junit.Test
-    public void createBCSheet(){
-        List<String> barCodes = new ArrayList<>();
+    BCPrint bcPrint = new BCPrint();
 
-        Map<String, Object> result = BCPrint.getSheet(barCodes);
+    @org.junit.Test
+    public void createBCSheet() throws IOException {
+        List<String> barCodes = buildTestBCodes();
+
+        Map<String, Object> result = bcPrint.getSheet(barCodes);
 
         Assert.assertNotNull(result);
         Assert.assertFalse(result.isEmpty());
@@ -28,33 +29,48 @@ public class Test {
         Assert.assertNotNull(value);
         Assert.assertTrue(value.length > 0);
 
+        FileOutputStream fos = new FileOutputStream("D:\\RND\\workspace\\BCPrint\\docs\\2.pdf");
+        fos.write(value);
+        fos.close();
+    }
 
+    private List<String> buildTestBCodes() {
+        List<String> barCodes = new ArrayList<>();
+
+        for (int i = 1; i < 43; i++) {
+            String barcode = "00000001" + String.format("%012d", i);
+            barCodes.add(barcode);
+        }
+        return barCodes;
     }
 
 
     @org.junit.Test
-    public void devide(){
+    public void divide() {
         Integer count = 11;
-        Integer devider = 3;
-
-        System.out.print((int) Math.ceil((double) count / devider));
-
+        Integer divider = 3;
+        System.out.print((int) Math.ceil((double) count / divider));
     }
 
     @org.junit.Test
     public void testcode () throws Exception {
         Document document = new Document(PageSize.A4, 20,15,15,5);
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(
-                "D:\\Temp\\barcodetest\\2.pdf"));
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        PdfWriter writer = PdfWriter.getInstance(document, bos);
         document.open();
 
         PdfContentByte cb = writer.getDirectContent();
-
         document.add(createTable(cb));
-
         document.newPage();
-
         document.close();
+
+        bos.close();
+        byte[] arr = bos.toByteArray();
+
+        FileOutputStream fos = new FileOutputStream("D:\\RND\\workspace\\BCPrint\\docs\\2.pdf");
+        fos.write(arr);
+        fos.close();
     }
 
 
