@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class Test {
         Assert.assertNotNull(value);
         Assert.assertTrue(value.length > 0);
 
-        FileOutputStream fos = new FileOutputStream("D:\\RND\\workspace\\BCPrint\\docs\\2.pdf");
+        FileOutputStream fos = new FileOutputStream(String.format("D:\\temp\\bcprint\\%s.pdf",new Date().getTime()));
         fos.write(value);
         fos.close();
     }
@@ -68,7 +69,7 @@ public class Test {
         bos.close();
         byte[] arr = bos.toByteArray();
 
-        FileOutputStream fos = new FileOutputStream("D:\\RND\\workspace\\BCPrint\\docs\\2.pdf");
+        FileOutputStream fos = new FileOutputStream("D:\\temp\\bcprint\\23.pdf");
         fos.write(arr);
         fos.close();
     }
@@ -84,7 +85,7 @@ public class Test {
         defCell.setBorder(25);
         defCell.setBorderColor(BaseColor.WHITE);
         defCell.setPadding(5);
-        defCell.setFixedHeight(58.5f);
+        //defCell.setFixedHeight(58.5f);
 
 
         table.addCell(getBarcode(cb, "00000001000000000015"));

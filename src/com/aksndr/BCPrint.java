@@ -27,7 +27,7 @@ public class BCPrint {
     }
 
     private byte[] createSheet(List<String> barCodes) throws DocumentException {
-        Document document = new Document(PageSize.A4, 20, 15, 15, 5);
+        Document document = new Document(PageSize.A4,-10f,5f,0f,-5f);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         PdfWriter writer = PdfWriter.getInstance(document, bos);
@@ -52,10 +52,15 @@ public class BCPrint {
         table.setHorizontalAlignment(Element.ALIGN_CENTER);
 
         PdfPCell defCell = table.getDefaultCell();
-        defCell.setBorder(25);
+        defCell.setUseBorderPadding(true);
+
         defCell.setBorderColor(BaseColor.WHITE);
-        defCell.setPadding(5);
-        defCell.setFixedHeight(58.5f);
+        defCell.setUseBorderPadding(true);
+        defCell.setPaddingRight(15);
+        defCell.setPaddingLeft(15);
+        defCell.setPaddingTop(10);
+//        defCell.setPaddingBottom(11);
+        defCell.setFixedHeight(60.5f);
 
         for (String bCode : barCodes) {
             table.addCell(getBarcode(cb, bCode));
@@ -65,9 +70,10 @@ public class BCPrint {
     }
 
     private Image getBarcode(PdfContentByte cb, String s) {
-        Barcode128 code128 = new Barcode128();
-        code128.setCode(s);
-        return code128.createImageWithBarcode(cb, null, null);
+        Barcode128 code = new Barcode128();
+        code.setCode(s);
+        code.setBarHeight(20f);
+        return code.createImageWithBarcode(cb, null, null);
     }
 
     private static Map<String, Object> succeed(Object value){
