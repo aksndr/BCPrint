@@ -20,17 +20,19 @@ public class BCPrint {
         byte[] value;
         try {
             value = createSheet(barCodes);
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             return failed(e.getMessage());
         }
         return succeed(value);
     }
 
-    private byte[] createSheet(List<String> barCodes) throws DocumentException {
-        Document document = new Document(PageSize.A4,-10f,5f,0f,-5f);
+    private byte[] createSheet(List<String> barCodes) throws Exception {
+        Document document = new Document(PageSize.A4, 0f, 0f, -5f, -5f); //
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         PdfWriter writer = PdfWriter.getInstance(document, bos);
+        writer.setPDFXConformance(PdfWriter.PDFX32002);
+        writer.setPdfVersion(PdfWriter.VERSION_1_3);
         document.open();
 
         PdfContentByte cb = writer.getDirectContent();
@@ -46,7 +48,7 @@ public class BCPrint {
         return bos.toByteArray();
     }
 
-    private PdfPTable createTable(PdfContentByte cb, List<String> barCodes) throws DocumentException {
+    private PdfPTable createTable(PdfContentByte cb, List<String> barCodes) throws Exception {
         PdfPTable table = new PdfPTable(3);
         table.setWidthPercentage(100);
         table.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -69,11 +71,14 @@ public class BCPrint {
         return table;
     }
 
-    private Image getBarcode(PdfContentByte cb, String s) {
+    private Image getBarcode(PdfContentByte cb, String s) throws IOException, DocumentException {
+        BaseFont bf = BaseFont.createFont("c:/Windows/Fonts/arial.ttf", BaseFont.WINANSI, BaseFont.EMBEDDED); //BaseFont.HELVETICA
         Barcode128 code = new Barcode128();
         code.setCode(s);
         code.setBarHeight(20f);
-        return code.createImageWithBarcode(cb, null, null);
+        code.setFont(bf);
+        Image bCode = code.createImageWithBarcode(cb, null, null);
+        return bCode;
     }
 
     private static Map<String, Object> succeed(Object value){
