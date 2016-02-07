@@ -39,7 +39,7 @@ public class Test {
 
     @org.junit.Test
     public void createBCSheet2() throws Exception {
-        List<String> barCodes = buildTestBCodes();
+        List<String> barCodes = buildTestBCodes(123);
 
 
         byte[] value = bcPrint2.createSheet(barCodes);

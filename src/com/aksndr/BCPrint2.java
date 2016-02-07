@@ -20,7 +20,7 @@ public class BCPrint2 {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         PdfWriter writer = PdfWriter.getInstance(document, bos);
-        writer.setPDFXConformance(PdfWriter.PDFXNONE);
+        writer.setPDFXConformance(PdfWriter.PDFX1A2001);
         writer.setPdfVersion(PdfWriter.VERSION_1_4);
         document.open();
 
@@ -30,15 +30,22 @@ public class BCPrint2 {
         float x = Utilities.millimetersToPoints(6);
         for (String bCode : barCodes) {
             i++;
+
+            if ((i % 43) == 0) {
+                document.newPage();
+                y = Utilities.millimetersToPoints(2);
+                x = Utilities.millimetersToPoints(6);
+            }
+
             Image image = getBarcode(cb, bCode);
             //for (float x = 10f; x < PageSize.A4.getWidth(); ) {
             //for (float y = 5f; y < PageSize.A4.getHeight(); ) {
             //float y1 = PageSize.A4.getHeight() - y;
 //                    image.setAbsolutePosition(x, y1);
             image.setAbsolutePosition(x, document.getPageSize().getHeight() - image.getHeight() - y);
-            writer.getDirectContent().addImage(image);
+            //writer.getDirectContent().addImage(image);
 
-            // document.add(image);
+            document.add(image);
 
             // }
             x += Utilities.millimetersToPoints(10) + image.getWidth();
@@ -51,10 +58,13 @@ public class BCPrint2 {
                 y += Utilities.millimetersToPoints(21.3f);
                 x = Utilities.millimetersToPoints(6);
             }
+
+
         }
 
 
 //        cb.fill();
+
         document.close();
         byte[] b = bos.toByteArray();
         try {
