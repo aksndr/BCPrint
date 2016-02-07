@@ -27,48 +27,57 @@ public class BCPrint {
     }
 
     private byte[] createSheet(List<String> barCodes) throws Exception {
-        Document document = new Document(PageSize.A4, 0f, 0f, -5f, -5f); //
+        Document document = new Document(PageSize.A4, 0, 0, 0, 0);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         PdfWriter writer = PdfWriter.getInstance(document, bos);
-        writer.setPDFXConformance(PdfWriter.PDFX32002);
-        writer.setPdfVersion(PdfWriter.VERSION_1_3);
+        writer.setPDFXConformance(PdfWriter.PDFXNONE);
+        writer.setPdfVersion(PdfWriter.VERSION_1_4);
         document.open();
 
         PdfContentByte cb = writer.getDirectContent();
         document.add(createTable(cb, barCodes));
         document.newPage();
         document.close();
-
+        byte[] b = bos.toByteArray();
         try {
             bos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return bos.toByteArray();
+        return b;
     }
 
     private PdfPTable createTable(PdfContentByte cb, List<String> barCodes) throws Exception {
         PdfPTable table = new PdfPTable(3);
-        table.setWidthPercentage(100);
+        table.setTotalWidth(PageSize.A4.getWidth());
+        table.setLockedWidth(true);
+        //table.setWidthPercentage(100);
         table.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-        PdfPCell defCell = table.getDefaultCell();
-        defCell.setUseBorderPadding(true);
-
-        defCell.setBorderColor(BaseColor.WHITE);
-        defCell.setUseBorderPadding(true);
-        defCell.setPaddingRight(15);
-        defCell.setPaddingLeft(15);
-        defCell.setPaddingTop(10);
-//        defCell.setPaddingBottom(11);
-        defCell.setFixedHeight(60.5f);
-
+        //PdfPCell defCell = table.getDefaultCell();
+        int i = 0;
         for (String bCode : barCodes) {
-            table.addCell(getBarcode(cb, bCode));
+            i++;
+            Image img = getBarcode(cb, bCode);
+            PdfPCell cell = createCell(img);
+            table.addCell(cell);
+            if ((i % 3) == 0) {
+                table.completeRow();
+            }
         }
-        table.completeRow();
+        table.setComplete(true);
         return table;
+    }
+
+    private PdfPCell createCell(Image img) throws IOException, DocumentException {
+        PdfPCell cell = new PdfPCell(img, true);
+        cell.setBorderColor(BaseColor.GREEN);
+        cell.setPaddingLeft(15f);
+        cell.setPaddingRight(15f);
+        cell.setPaddingTop(5f);
+        //cell.setPaddingBottom(11);
+        cell.setFixedHeight(60.1f);
+        return cell;
     }
 
     private Image getBarcode(PdfContentByte cb, String s) throws IOException, DocumentException {
